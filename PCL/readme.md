@@ -29,8 +29,32 @@ pcl::PointCloud<pcl::PointXYZ>
 
 // struct
 Pcl::PointXYZ
-Pcl::PointXYZI
-Pcl::PointXYZRGB
+Pcl::PointXYZI // LiDAR
+Pcl::PointXYZRGB // Depth cam
 Pcl::PCLPointCloud2
 ```
 
+## 1.3 sensor_msgs::PointCloud2 <-> pcl::PointCloud
+```shell
+#include <sensor_msgs/PointCloud2.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <pcl/conversions.h>
+#include <pcl_conversions/pcl_conversions.h>
+```
+sensor_msgs::PointCloud2 -> pcl::PCLPointCloud2
+```shell
+pcl::PCLPointCloud2 rtp (const sensor_msgs::PointCloud2 msg) {
+  pcl::PCLPointCloud2 pcl_pc;
+  pcl_conversions::toPCL(msg, pcl_pc);
+  return pcl_pc;
+}
+```
+pcl::PointCloud -> sensor_msgs::PointCloud2
+```shell
+pcl::PointCloud<PointXYZI> ptr (const pcl::PCLPointCloud2 pcl_pc) {
+  pcl::PointCloud<PointXYZI> msg;
+  pcl_conversions::toPCL(pcl_pc, msg);
+  return msg;
+}
+```
