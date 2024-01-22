@@ -58,3 +58,20 @@ pcl::PointCloud<PointXYZI> ptr (const pcl::PCLPointCloud2 pcl_pc) {
   return msg;
 }
 ```
+
+## 1.4 ROI
+passthrough filter
+```shell
+#include <pcl/point_types.h>
+#include <pcl/filters/passthrough.h>
+
+pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
+pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZI>);
+...
+
+pcl::PassThrough<pcl::PointXYZRGB> pass;
+pass.setInputCloud (cloud);        // input
+pass.setFilterFieldName ("z");     // eg. x, y, z
+pass.setFilterLimits (0.70, 1.5);  // min, max
+pass.filter (*cloud_filtered);     // apply filter
+```
