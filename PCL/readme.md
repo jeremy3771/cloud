@@ -69,7 +69,7 @@ pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>)
 pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZI>);
 ...
 
-pcl::PassThrough<pcl::PointXYZRGB> pass;
+pcl::PassThrough<pcl::PointXYZI> pass;
 pass.setInputCloud (cloud);        // input
 pass.setFilterFieldName ("z");     // eg. x, y, z
 pass.setFilterLimits (0.70, 1.5);  // min, max
