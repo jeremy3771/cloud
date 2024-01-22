@@ -5,10 +5,24 @@ To study PCL(Point Cloud Library) cpp
 
 Distribution
 -------------
-* Ubuntu 20.04, ROS2 Foxy
-* Ubuntu 22.04, ROS2 Humble
+- Ubuntu 20.04, ROS2 Foxy
+- Ubuntu 22.04, ROS2 Humble
 
-## Template & Struct
+## 1.1 PCL function
+- pcl_filters: Remove noise
+- pcl_features: 3D feture estimation
+- pcl_keypoints: Keypoint detection
+- pcl_registration: Combine several datasets
+- pcl_kdtree: Using FLANN
+- pcl_octree: Creating a hierarchical tree data stucture
+- pcl_segmentation: Segmenting a point cloud
+- pcl_sample_consensus: RANSEC
+- pcl_surface: reconstructing surfaces from 3D scans
+- pcl_range_image: Represent distance, convert from sensors
+- pcl_io: r/w PCD files
+- pcl_visualization: Visualize the algorithms operating on 3D point cloud data
+
+## 1.2 Template & Struct
 ```shell
 // template
 pcl::PointCloud<pcl::PointXYZ>
@@ -19,4 +33,4 @@ Pcl::PointXYZI
 Pcl::PointXYZRGB
 Pcl::PCLPointCloud2
 ```
-ros
+
