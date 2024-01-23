@@ -95,6 +95,5 @@ voxel_filter.setInputCloud(src);  // src: Orignal PointCloud(Input)
 voxel_filter.setLeafSize(voxelsize, voxelsize, voxelsize);
 voxel_filter.filter(*ptr_filtered); // output
 
-pc_voxelized = *ptr_filtered;     // Not used in this code
-PCL
+pc_voxelized = *ptr_filtered;
 ...
