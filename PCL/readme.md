@@ -28,10 +28,10 @@ Distribution
 pcl::PointCloud<pcl::PointXYZ>
 
 // struct
-Pcl::PointXYZ
-Pcl::PointXYZI // LiDAR
-Pcl::PointXYZRGB // Depth cam
-Pcl::PCLPointCloud2
+pcl::PointXYZ
+pcl::PointXYZI // LiDARp
+pcl::PointXYZRGB // Depth cam
+pcl::PCLPointCloud2
 ```
 
 ## 1.3 sensor_msgs::PointCloud2 <-> pcl::PointCloud
@@ -91,9 +91,10 @@ pcl::PointCloud<pcl::PointXYZ> voxel_filter;
 
 float voxelsize = 0.2;
 
-voxel_filter.setInputCloud(src);
+voxel_filter.setInputCloud(src);  // src: Orignal PointCloud(Input)
 voxel_filter.setLeafSize(voxelsize, voxelsize, voxelsize);
-voxel_filter.filter(*ptr_filtered);
+voxel_filter.filter(*ptr_filtered); // output
 
-pc_voxelized = *ptr_filtered;
+pc_voxelized = *ptr_filtered;     // Not used in this code
+PCL
 ...
