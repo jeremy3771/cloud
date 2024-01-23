@@ -23,7 +23,7 @@ Distribution
 - pcl_visualization: Visualize the algorithms operating on 3D point cloud data
 
 ## 1.2 Template & Struct
-```shell
+```cpp
 // template
 pcl::PointCloud<pcl::PointXYZ>
 
@@ -35,7 +35,7 @@ Pcl::PCLPointCloud2
 ```
 
 ## 1.3 sensor_msgs::PointCloud2 <-> pcl::PointCloud
-```shell
+```cpp
 #include <sensor_msgs/PointCloud2.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -43,7 +43,7 @@ Pcl::PCLPointCloud2
 #include <pcl_conversions/pcl_conversions.h>
 ```
 sensor_msgs::PointCloud2 -> pcl::PCLPointCloud2
-```shell
+```cpp
 pcl::PCLPointCloud2 rtp (const sensor_msgs::PointCloud2 msg) {
   pcl::PCLPointCloud2 pcl_pc;
   pcl_conversions::toPCL(msg, pcl_pc);
@@ -51,7 +51,7 @@ pcl::PCLPointCloud2 rtp (const sensor_msgs::PointCloud2 msg) {
 }
 ```
 pcl::PointCloud -> sensor_msgs::PointCloud2
-```shell
+```cpp
 pcl::PointCloud<PointXYZI> ptr (const pcl::PCLPointCloud2 pcl_pc) {
   pcl::PointCloud<PointXYZI> msg;
   pcl_conversions::toPCL(pcl_pc, msg);
@@ -61,13 +61,14 @@ pcl::PointCloud<PointXYZI> ptr (const pcl::PCLPointCloud2 pcl_pc) {
 
 ## 1.4 ROI
 passthrough filter
-```shell
+```cpp
 #include <pcl/point_types.h>
 #include <pcl/filters/passthrough.h>
 
 pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
 pcl::PointCloud<pcl::PointXYZI>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZI>);
-...
+
+//~~~~~~~~~~~
 
 pcl::PassThrough<pcl::PointXYZI> pass;
 pass.setInputCloud (cloud);        // input
@@ -75,3 +76,24 @@ pass.setFilterFieldName ("z");     // eg. x, y, z
 pass.setFilterLimits (0.70, 1.5);  // min, max
 pass.filter (*cloud_filtered);     // apply filter
 ```
+## 1.5 Voxelization
+N Pointcloud -> 1 Centroid
+```cpp
+#include <pcl/filters/voxel_grid.h>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+
+//~~~~~~~~~~~
+
+pcl::PointCloud<pcl::PointXYZ> pc_voxelized;
+pcl::PointCloud<pcl::PointXYZ>::Ptr ptr_filtered(new pcl::PointCloud::PointXYZ);
+pcl::PointCloud<pcl::PointXYZ> voxel_filter;
+
+float voxelsize = 0.2;
+
+voxel_filter.setInputCloud(src);
+voxel_filter.setLeafSize(voxelsize, voxelsize, voxelsize);
+voxel_filter.filter(*ptr_filtered);
+
+pc_voxelized = *ptr_filtered;
+...
