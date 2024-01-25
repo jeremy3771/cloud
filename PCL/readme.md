@@ -1,7 +1,6 @@
-# PCL
+# PCL-cpp
 > Minhyuk Kim
 
-To study PCL(Point Cloud Library) cpp
 
 Distribution
 -------------
