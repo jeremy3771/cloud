@@ -1,7 +1,7 @@
 # Author: TaeYoung Kim
 # email: tyoung96@yonsei.ac.kr
 
-FROM arm64v8/ros:humble-perception-jammy
+FROM dustynv/ros:humble-desktop-l4t-r36.2.0
 
 # Install PCL & Eigen & essential libraries
 RUN apt-get update && apt-get install -y cmake libatlas-base-dev libeigen3-dev libpcl-dev libgoogle-glog-dev libsuitesparse-dev libglew-dev wget unzip git python3-pip
