@@ -14,7 +14,7 @@ RUN git clone https://github.com/Livox-SDK/Livox-SDK2.git
 WORKDIR /root/Livox-SDK2
 RUN mkdir build
 WORKDIR /root/Livox-SDK2/build
-RUN cmake .. && make -j2 && make install
+RUN cmake .. && make -j4 && make install
 
 
 RUN /bin/bash -c '. /opt/ros/humble/setup.bash;'
