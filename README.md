@@ -6,7 +6,7 @@ Using MID-360 with Docker in JAO
 ### 1.1 build container
 #### Dockerfile
 ```shell
-FROM arm64v8/ros:humble-perception-jammy #ROS2 in ARM64 arch
+FROM arm64v8/ros:humble #ROS2 in ARM64 arch
 ```
 #### container_run.sh
 ```shell
