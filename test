@@ -1,0 +1,181 @@
+#include <DynamixelSDK.h>
+
+// Control table address
+#define ADDR_OPERATING_MODE             11
+#define ADDR_TORQUE_ENABLE              64
+#define ADDR_GOAL_VELOCITY              104
+#define ADDR_GOAL_POSITION              116
+#define ADDR_PRESENT_VELOCITY           128
+#define ADDR_PRESENT_POSITION           132
+
+// Data Byte Length
+#define LEN_GOAL_VELOCITY               4
+#define LEN_GOAL_POSITION               4
+#define LEN_PRESENT_VELOCITY            4
+#define LEN_PRESENT_POSITION            4
+
+// Protocol version
+#define PROTOCOL_VERSION                2.0
+
+// Default setting
+#define DXL1_ID                         1                   // Dynamixel#1 ID: 1
+#define DXL2_ID                         2                   // Dynamixel#2 ID: 2
+#define DXL3_ID                         3                   // Dynamixel#3 ID: 3
+#define DXL4_ID                         4                   // Dynamixel#4 ID: 4
+#define DXL5_ID                         5                   // Dynamixel#4 ID: 5
+#define BAUDRATE                        1000000
+#define DEVICENAME                      "3"
+
+#define TORQUE_ENABLE                   1                   // Value for enabling the torque
+#define TORQUE_DISABLE                  0                   // Value for disabling the torque
+#define VELOCITY_CONTROL_MODE           1                   // Value for velocity control mode (operating mode)
+#define EXT_POSITION_CONTROL_MODE       4                   // Value for extended position control mode (operating mode)
+
+#define MAX_POSITION_VALUE              1048575
+
+#define DXL_MOVING_STATUS_THRESHOLD     20                  // Dynamixel moving status threshold
+
+#define ESC_ASCII_VALUE                 0x1b
+
+void setup() {
+  dynamixel::PortHandler *portHandler = dynamixel::PortHandler::getPortHandler(DEVICENAME);
+  dynamixel::PacketHandler *packetHandler = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION);
+  dynamixel::GroupBulkWrite groupBulkWrite(portHandler, packetHandler);
+  dynamixel::GroupBulkRead groupBulkRead(portHandler, packetHandler);
+
+  int dxl_comm_result = COMM_TX_FAIL;             // Communication result
+  int dxl_goal_position = 0;
+  int dxl_goal_velocity_stop = 0;
+  int dxl_goal_velocity_move = 70;               // max: 200
+  bool dxl_addparam_result = false;               // addParam result
+  bool dxl_getdata_result = false;                // GetParam result
+
+  uint8_t param_goal_position[4];
+  uint8_t param_goal_velocity_stop[4];
+  uint8_t param_goal_velocity_move[4];
+  uint8_t dxl_error = 0;                          // Dynamixel error
+  int32_t dxl_present_position = 0;               // Present position
+  int32_t dxl_zero_position = 100;
+  int32_t dxl_position1 = 2400;
+  int32_t dxl_position2 = 3300;
+
+  param_goal_velocity_stop[0] = DXL_LOBYTE(DXL_LOWORD(dxl_goal_velocity_stop));
+  param_goal_velocity_stop[1] = DXL_HIBYTE(DXL_LOWORD(dxl_goal_velocity_stop));
+  param_goal_velocity_stop[2] = DXL_LOBYTE(DXL_HIWORD(dxl_goal_velocity_stop));
+  param_goal_velocity_stop[3] = DXL_HIBYTE(DXL_HIWORD(dxl_goal_velocity_stop));
+
+  param_goal_velocity_move[0] = DXL_LOBYTE(DXL_LOWORD(dxl_goal_velocity_move));
+  param_goal_velocity_move[1] = DXL_HIBYTE(DXL_LOWORD(dxl_goal_velocity_move));
+  param_goal_velocity_move[2] = DXL_LOBYTE(DXL_HIWORD(dxl_goal_velocity_move));
+  param_goal_velocity_move[3] = DXL_HIBYTE(DXL_HIWORD(dxl_goal_velocity_move));
+
+  // Open port
+  if (portHandler->openPort())
+  {
+    Serial.print("Succeeded to open the port!\n");
+  }
+  else
+  {
+    Serial.print("Failed to open the port!\n");
+    Serial.print("Press any key to terminate...\n");
+    return;
+  }
+
+  // Set port baudrate
+  if (portHandler->setBaudRate(BAUDRATE))
+  {
+    Serial.print("Succeeded to change the baudrate!\n");
+  }
+  else
+  {
+    Serial.print("Failed to change the baudrate!\n");
+    Serial.print("Press any key to terminate...\n");
+    return;
+  }
+
+  // Set operating mode to velocity control mode #1
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL1_ID, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Set operating mode to velocity control mode #2
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL2_ID, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Set operating mode to velocity control mode #3
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL3_ID, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Set operating mode to velocity control mode #4
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL4_ID, ADDR_OPERATING_MODE, VELOCITY_CONTROL_MODE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Set operating mode to extended position control mode #5
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL5_ID, ADDR_OPERATING_MODE, EXT_POSITION_CONTROL_MODE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Enable Dynamixel#1 Torque
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL1_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Enable Dynamixel#2 Torque
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL2_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+  
+  // Enable Dynamixel#3 Torque
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL3_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Enable Dynamixel#4 Torque
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL4_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+
+  // Enable Dynamixel#5 Torque
+  dxl_comm_result = packetHandler->write1ByteTxRx(portHandler, DXL5_ID, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS)
+    packetHandler->getTxRxResult(dxl_comm_result);
+  else if (dxl_error != 0)
+    packetHandler->getRxPacketError(dxl_error);
+  
+  dxl_comm_result = packetHandler->write4ByteTxRx(portHandler, DXL5_ID, ADDR_GOAL_POSITION, dxl_zero_position, &dxl_error);
+  if (dxl_comm_result != COMM_SUCCESS) packetHandler->getTxRxResult(dxl_comm_result);
+  delay(1000);
+
+  dxl_addparam_result = groupBulkWrite.addParam(DXL1_ID, ADDR_GOAL_VELOCITY, LEN_GOAL_VELOCITY, param_goal_velocity_move);
+  dxl_addparam_result = groupBulkWrite.addParam(DXL2_ID, ADDR_GOAL_VELOCITY, LEN_GOAL_VELOCITY, param_goal_velocity_move);
+  dxl_addparam_result = groupBulkWrite.addParam(DXL3_ID, ADDR_GOAL_VELOCITY, LEN_GOAL_VELOCITY, param_goal_velocity_move);
+  dxl_addparam_result = groupBulkWrite.addParam(DXL4_ID, ADDR_GOAL_VELOCITY, LEN_GOAL_VELOCITY, param_goal_velocity_move);
+  dxl_comm_result = groupBulkWrite.txPacket();
+  if (dxl_comm_result != COMM_SUCCESS) packetHandler->getTxRxResult(dxl_comm_result);
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+}
