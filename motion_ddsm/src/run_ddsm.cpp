@@ -27,10 +27,10 @@ public:
     }
 private:
     void timer_cb() {
-        // port1.SET_VELOCITY(1, motor_rpm_[0]);
-        // port2.SET_VELOCITY(1, motor_rpm_[1]);
-        // port3.SET_VELOCITY(1, motor_rpm_[2]);
-        // port4.SET_VELOCITY(1, motor_rpm_[3]);
+        port1.SET_VELOCITY(1, motor_rpm_[0]);
+        port2.SET_VELOCITY(1, motor_rpm_[1]);
+        port3.SET_VELOCITY(1, motor_rpm_[2]);
+        port4.SET_VELOCITY(1, motor_rpm_[3]);
     }
 
     void twist_cb(const geometry_msgs::msg::Twist msg) {
