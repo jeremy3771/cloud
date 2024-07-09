@@ -5,7 +5,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/twist.hpp"
-#include "motion_ddsm/motor_command.hpp"
+#include "ddsm_ackermann/motor_command.hpp"
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
@@ -36,28 +36,19 @@ private:
     void twist_cb(const geometry_msgs::msg::Twist msg) {
         double v = msg.linear.x;
         double omega = msg.angular.z;
-        auto radius = omega / v;
+        auto radius = v / omega;
         double cf = PI * wheelDiameter_;
 
         double omega1 = omega * sqrt(pow((radius - axleWidth_ / 2), 2) + pow((wheelbase_ / 2), 2)) / cf;
         double omega2 = omega * sqrt(pow((radius + axleWidth_ / 2), 2) + pow((wheelbase_ / 2), 2)) / cf;
 
-        motor_z_axis_[2] = 0.0;
-        motor_z_axis_[3] = 0.0;
-        motor_z_axis_[4] = 0.0;
-        motor_z_axis_[5] = 0.0;
-
         if (omega < 0) {
-            motor_z_axis_[0] = std::atan2(wheelbase_, radius + (axleWidth_ / 2));
-            motor_z_axis_[1] = std::atan2(wheelbase_, radius - (axleWidth_ / 2));
             motor_rpm_[0] = omega2;
             motor_rpm_[1] = omega1;
             motor_rpm_[2] = omega2;
             motor_rpm_[3] = omega1;
         }
         else if(omega > 0) {
-            motor_z_axis_[0] = std::atan2(wheelbase_, radius - (axleWidth_ / 2));
-            motor_z_axis_[1] = std::atan2(wheelbase_, radius + (axleWidth_ / 2));
             motor_rpm_[0] = omega1;
             motor_rpm_[1] = omega2;
             motor_rpm_[2] = omega1;
@@ -73,7 +64,6 @@ private:
 
     rclcpp::TimerBase::SharedPtr timer_;
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr twist_sub_;
-    double motor_z_axis_[6] = {0.0}; // front, middle, back
     double motor_rpm_[4] = {0.0}; // LF, RF, LR, RR
     MOTOR_COMMAND port1, port2, port3, port4;
     double wheelbase_, axleWidth_, wheelDiameter_;
