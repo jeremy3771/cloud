@@ -655,7 +655,6 @@ void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPt
     trans_footprint_link.header.frame_id = "base_footprint";
     trans_footprint_link.child_frame_id = "base_link";
     trans_footprint_link.header.stamp = get_ros_time(lidar_end_time);
-    // 여기에서 base_footprint에서 base_link까지의 변환 값을 설정하세요
     trans_footprint_link.transform.translation.x = 0.0;
     trans_footprint_link.transform.translation.y = 0.0;
     trans_footprint_link.transform.translation.z = 0.0;
@@ -668,7 +667,6 @@ void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPt
     trans_link_scan.header.frame_id = "base_link";
     trans_link_scan.child_frame_id = "base_scan";
     trans_link_scan.header.stamp = get_ros_time(lidar_end_time);
-    // 여기에서 base_link에서 base_scan까지의 변환 값을 설정하세요
     trans_link_scan.transform.translation.x = 0.0;
     trans_link_scan.transform.translation.y = 0.0;
     trans_link_scan.transform.translation.z = 0.1;
