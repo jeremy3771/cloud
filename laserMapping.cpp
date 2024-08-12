@@ -43,6 +43,7 @@
 #include <Python.h>
 #include <so3_math.h>
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp/time_source.hpp>
 #include <Eigen/Core>
 #include "IMU_Processing.hpp"
 #include <nav_msgs/msg/odometry.hpp>
@@ -620,11 +621,11 @@ void set_posestamp(T & out)
     
 }
 
-void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubOdomAftMapped, std::unique_ptr<tf2_ros::TransformBroadcaster> & tf_br)
+void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr pubOdomAftMapped, std::unique_ptr<tf2_ros::TransformBroadcaster> & tf_br, rclcpp::Time now)
 {
     odomAftMapped.header.frame_id = "odom";
     odomAftMapped.child_frame_id = "base_footprint";
-    odomAftMapped.header.stamp = get_ros_time(lidar_end_time);
+    odomAftMapped.header.stamp = now;
     set_posestamp(odomAftMapped.pose);
     pubOdomAftMapped->publish(odomAftMapped);
     auto P = kf.get_P();
@@ -642,7 +643,7 @@ void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPt
     geometry_msgs::msg::TransformStamped trans_odom_footprint;
     trans_odom_footprint.header.frame_id = "odom";
     trans_odom_footprint.child_frame_id = "base_footprint";
-    trans_odom_footprint.header.stamp = get_ros_time(lidar_end_time);
+    trans_odom_footprint.header.stamp = now;
     trans_odom_footprint.transform.translation.x = odomAftMapped.pose.pose.position.x;
     trans_odom_footprint.transform.translation.y = odomAftMapped.pose.pose.position.y;
     trans_odom_footprint.transform.translation.z = odomAftMapped.pose.pose.position.z;
@@ -654,7 +655,7 @@ void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPt
     geometry_msgs::msg::TransformStamped trans_footprint_link;
     trans_footprint_link.header.frame_id = "base_footprint";
     trans_footprint_link.child_frame_id = "base_link";
-    trans_footprint_link.header.stamp = get_ros_time(lidar_end_time);
+    trans_footprint_link.header.stamp = now;
     trans_footprint_link.transform.translation.x = 0.0;
     trans_footprint_link.transform.translation.y = 0.0;
     trans_footprint_link.transform.translation.z = 0.0;
@@ -666,7 +667,7 @@ void publish_odometry(const rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPt
     geometry_msgs::msg::TransformStamped trans_link_scan;
     trans_link_scan.header.frame_id = "base_link";
     trans_link_scan.child_frame_id = "base_scan";
-    trans_link_scan.header.stamp = get_ros_time(lidar_end_time);
+    trans_link_scan.header.stamp = now;
     trans_link_scan.transform.translation.x = 0.0;
     trans_link_scan.transform.translation.y = 0.0;
     trans_link_scan.transform.translation.z = 0.1;
@@ -1104,7 +1105,7 @@ private:
             double t_update_end = omp_get_wtime();
 
             /******* Publish odometry *******/
-            publish_odometry(pubOdomAftMapped_, tf_broadcaster_);
+            publish_odometry(pubOdomAftMapped_, tf_broadcaster_, this->get_clock()->now());
 
             /*** add the feature points to map kdtree ***/
             t3 = omp_get_wtime();
