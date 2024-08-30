@@ -18,7 +18,7 @@ include_directories(include ${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
-add_executable(environment src/environment.cpp src/processPointClouds.cpp)
+add_executable(environment src/environment.cpp)
 
 
 target_link_libraries(environment
